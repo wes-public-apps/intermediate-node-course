@@ -19,21 +19,67 @@ app.listen(port, ()=>{
 //connect to database
 mongoose.connect('mongodb://localhost/userData');
 
-// CREATE
-app.post('/users',(req,res)=>{
-  // User.create()
+// Create homepage
+app.get('/',(req,res)=>{
+  res.json({
+    success: true,
+    message: "Home!"
+  })
 })
 
+// Create users page
+app.get('/users',(req,res)=>{
+  res.json({
+    success: true,
+    message: "users!"
+  })
+})
+
+app.post('/users',(req,res)=>{
+  User.create({
+    name: req.body.newData.name,
+    email: req.body.newData.email,
+    password: req.body.newData.password
+  },
+  (err,data)=>{
+    if(err){
+      res.json({success: false, message: err});
+    } else if (!data){
+      res.json({success: false, message: "Not Found"});
+    } else {
+      res.json({success: true, data: data});
+    }
+  });
+})
+
+// Manage User Specific Data
 app.route('/users/:id')
-// READ
-.get((req,res)=>{
-  // User.findById()
-})
-// UPDATE
-.put((req,res)=>{
-  // User.findByIdAndUpdate()
-})
-// DELETE
-.delete((req,res)=>{
-  // User.findByIdAndDelete()
-})
+  // Get user data from DB
+  .get((req,res)=>{
+    User.findById(req.params.id,(err,data)=>{
+      if(err){
+        res.json({
+          success: false,
+          message: err
+        });
+      } else if (!data){
+        res.json({
+          success: false,
+          message: "User data not found"
+        });
+      } else {
+        res.json({
+          success: true,
+          data: data
+        });
+      }
+    });
+  })
+  // UPDATE
+  .put((req,res)=>{
+    // User.findByIdAndUpdate()
+  })
+  // DELETE
+  .delete((req,res)=>{
+    // User.findByIdAndDelete()
+  })
